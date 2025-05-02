@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 """
 Budowniczy
+
 Przygotować klasę Pizza, która będzie mogła zawierać różne składniki 
 (ser, salami, pieczarki, cebula itd.). Zastosować wzorzec budowniczego, aby 
 umożliwić stopniowe dodawanie składników do pizzy.
@@ -12,8 +13,8 @@ różnych wariantów obiektów (np. dla pizzy vege, mięsnej, serowej, itd.).
 
 Przygotować klasę Computer, która posiada wiele parametrów przekazywanych w 
 inicjalizatorze. Przerobić nastęopnie kod tak, aby zamiast dużego konstruktora użyć wzorca budowniczego
-
-
+"""
+"""
 from typing import List
 
 
@@ -99,142 +100,104 @@ computer1 = Computer("Intel I7", "NVIDIA RTX 3070", "Windows 11", 32)
 print(pizza)
 print(vege_pizza)
 print(computer1)
-"""
+
 
 #Zad2
 
-"""
-Metoda wytwórcza
-Utworzyć interfejs Document i klasy: WordDocument, PDFDocument, 
-a następnie przygotować metodę wytwórczą, która decyduje, jaki dokument utworzyć 
-na podstawie zadanego rozszerzenia pliku.
-
-Utworzyć klasę AnimalFactory, która na podstawie podanego parametru 
-(np. "dog", "cat") zwraca obiekt odpowiedniej klasy (Dog, Cat).
-
-Rozbuduj przygotowane implementacje Metody Wytwórczej, tak aby mogły 
-obsługiwać dynamiczne rejestrowanie nowych klas zamiast statycznych instrukcji warunkowych.
-
-#a
 class Document(ABC):
     @abstractmethod
-    def create_document(self) -> str:
+    def type_document(self) -> str:
         pass
 
-class WordDocument(Document):
-    def create_document(self) -> str:
-        return "Tworzymy dokument WordDocument"
-
 class PDFDocument(Document):
-    def create_document(self) -> str:
-        return "Tworzymy dokument PDFDocument"
+    def type_document(self) -> str:
+        return "You created PDF"
+
+class WordDocument(Document):
+    def type_document(self) -> str:
+        return "You created Word"
 
 class DocumentFactory:
     @staticmethod
-    def create_document(document_type: str) -> Document:
+    def type_document(document_type: str) -> Document:
         if document_type == "docx":
             return WordDocument()
         elif document_type == "pdf":
             return PDFDocument()
         else:
-            raise ValueError("Unknown type!")
+            return "Wront type_document"
 
-doc1 = DocumentFactory.create_document("pdf")
-print(doc1.create_document())
+doc1 = WordDocument()
+print(doc1.type_document())
+
 #b
+
 class Animal(ABC):
     @abstractmethod
-    def create_animal(self) -> str:
+    def do_animal(self) -> str:
         pass
-
-class Cat(Animal):
-    def create_animal(self) -> str:
-        return "Stworzono kota"
 
 class Dog(Animal):
-    def create_animal(self) -> str:
-        return "Stworzono doga"
+    def do_animal(self) -> str:
+        return "You created Dog"
 
+class Car(Animal):
+    def do_animal(self) -> str:
+        return "You created Cat"
 class AnimalFactory:
     @staticmethod
-    def create_animal(animal_type: str) -> Animal:
-        if animal_type.lower() == "dog":
-            return Dog()
-        elif animal_type.lower() == "cat":
-            return Cat()
+    def do_animal(move: str) -> Animal:
+        if move == "Hau Hau":
+            return "You created Dog"
+        elif move == "Miau Miau":
+            return "You created Cat"
         else:
-            raise ValueError("Unknown animal type!")
+            return "We do not know what you created"
 
-dog = AnimalFactory.create_animal("dog")
-print(dog.create_animal())
+animal1 = AnimalFactory.do_animal("Hau")
+print(animal1)
 
-from abc import ABC, abstractmethod
+#Zadb
 
-class Document(ABC):
+class Car(ABC):
     @abstractmethod
-    def open(self) -> str:
+    def specifications(self) -> str:
         pass
 
-class WordDocument(Document):
-    def open(self) -> str:
-        return "Opening a Word document (.docx)"
+class CarFactory(ABC):
+    @abstractmethod
+    def create_sedan(self) -> Car:
+        pass
 
-class PDFDocument(Document):
-    def open(self) -> str:
-        return "Opening a PDF document (.pdf)"
-
-class DocumentFactory:
-    _registry = {}
-
-    @classmethod
-    def register_document(cls, file_extension: str, document_class):
-        cls._registry[file_extension.lower()] = document_class
-
-    @classmethod
-    def create_document(cls, file_extension: str) -> Document:
-        if file_extension.lower() in cls._registry:
-            return cls._registry[file_extension.lower()]()
-        else:
-            raise ValueError(f"Unsupported document type: {file_extension}")
-
-DocumentFactory.register_document("docx", WordDocument)
-DocumentFactory.register_document("pdf", PDFDocument)
-
-doc1 = DocumentFactory.create_document("docx")
-print(doc1.open())
-
-doc2 = DocumentFactory.create_document("pdf")
-print(doc2.open())
+    @abstractmethod
+    def create_suv(self) -> Car:
+        pass
 
 
-class ExcelDocument(Document):
-    def open(self) -> str:
-        return "Opening an Excel document (.xlsx)"
 
-DocumentFactory.register_document("xlsx", ExcelDocument)
 
-doc3 = DocumentFactory.create_document("xlsx")
-print(doc3.open())
-try:
-    doc4 = DocumentFactory.create_document("txt")
-    print(doc4.open())
-except ValueError as e:
-    print(e)
-"""
 
-#Zad3
+@dataclass
+class Wheel:
+    diameter: int
+    material: str = field(default="aluminium")
 
-"""
-Fabryka abstrakcyjna
-Utworzyć Fabrykę Abstrakcyjną do produkcji samochodów różnych marek (TeslaFactory, BMWFactory). 
-Każda z fabryk powinna produkować dwa typy samochodów według nadwozia: Sedan i SUV.
+@dataclass
+class Body:
+    color: str
+    thickness: float = field(default=0.6)
 
-Do istniejącej implementacji Fabryki Abstrakcyjnej dodać nowy typ pojazdu: HatchbackCar, i 
-zaktualizować kod tak, aby obsługiwał nową kategorię.
+@dataclass
+class Door:
+    interior_material: str
+    control: str = field(default="manual")
 
-Zaimplementować Fabrykę Abstrakcyjną do procesu produkcji smartfonów. Każda z fabryk powinna produkować 
-dwa typy smartfonów: Apfel i Szajsung i dla każdego z nich modele z ostatnich 3 lat. Dodać do utworzonej 
-implementacji trzeci typ smartfonu: MajFon.
+@dataclass
+class Seat:
+    material: str
+    control: str = field(default="manual")
+
+
 
 #Zad3
 
@@ -465,85 +428,231 @@ if __name__ == "__main__":
     bmw_suv = manufacturer.produce_car()
 
     print(bmw_suv)
+
+
+from copy import deepcopy
+from typing import Any
+
+#Zad4
+from copy import deepcopy
+from typing import Any
+
+class CharacterPrototype:
+    def __init__(
+            self,
+            name: str,
+            height: int,
+            level: int,
+            power: int,
+            weight: int,
+            owner: str,
+            **kwargs: dict,
+    ) -> None:
+        self.name = name
+        self.height = height
+        self.level = level
+        self.power = power
+        self.weight = weight
+        self.owner = owner
+
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
+    def __str__(self) -> str:
+        summary = []
+
+        for key, val in vars(self).items():
+            summary.append(f"{key}: {val}\n")
+
+        return "".join(summary)
+
+Mage_player = CharacterPrototype("Mage", 200, 10, 5, 100, "Przemek")
+print(Mage_player)
+
+Warrior_player = CharacterPrototype("Warrior", 400, 15, 2, 250, "Andrzej")
+print(Warrior_player)
+
+
+class Prototype:
+    def __init__(self) -> None:
+        self.objects = dict()
+
+    def add_prototype(self, id_: int, obj: Any) -> None:
+        self.objects[id_] = obj
+
+    def del_prototype(self, id_: int) -> None:
+        del self.objects[id_]
+
+    def clone(self, id_: int, **kwargs: dict) -> Any:
+        if id_ in self.objects:
+            instance = deepcopy(self.objects[id_])
+
+            for key in kwargs:
+                setattr(instance, key, kwargs[key])
+
+            return instance
+        else:
+            raise ModuleNotFoundError("ID not found!")
+
+prototypes = Prototype()
+prototypes.add_prototype("1", Mage_player)
+another_player = prototypes.clone("1", owner="other")
+print(another_player)
+
+
+#c
+
+class Configuration:
+    def __init__(
+            self,
+            type: str,
+            windows: str,
+            min_graphic_card: str,
+            min_RAM: int,
+            author: str,
+            **kwargs: dict,
+
+
+
+
+        ) -> None:
+        self.type = type,
+        self.windows = windows,
+        self.min_graphic_card = min_graphic_card,
+        self.min_RAM = min_RAM,
+        self.author = author
+
+
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
+    def __str__(self) -> str:
+        summary = []
+
+        for key, val in vars(self).items():
+            summary.append(f"{key}: {val}\n")
+
+        return "".join(summary)
+
+app1 = Configuration("Game", "Windows 10", "NVIDIA GTX 1050", 4, "Przemek Hubacz")
+print("Original Configuration:")
+print(app1)
+
+class ConfigurationPrototype:
+    def __init__(self) -> None:
+        self.objects = {}
+
+    def add_prototype(self, id_: str, obj: Configuration) -> None:
+        self.objects[id_] = obj
+
+    def clone(self, id_: str, **kwargs: dict) -> Configuration:
+        if id_ in self.objects:
+            instance = deepcopy(self.objects[id_])
+
+            for key in kwargs:
+                setattr(instance, key, kwargs[key])
+
+            return instance
+        else:
+            raise ModuleNotFoundError("ID not found!")
+
+
+confprototype = ConfigurationPrototype()
+confprototype.add_prototype("1", app1)
+app_other_conf = confprototype.clone("1", author = "Bogdan Malanoski", type = "WEB app", min_RAM = 2)
+print("Cloned configuration:")
+print(app_other_conf)
+
+print()
 """
 
-from typing import List
+#Zad5
+
+from typing import Self
+
+class DatabaseConnection:
+    _instance: Self = None
+
+    def __new__(cls, *args: list, **kwargs: dict):
+        if cls._instance is None:
+            instance = super().__new__(cls)
+            cls._instance = instance
+
+        return cls._instance
+
+    def __init__(self, db_name: str, host: str, port: int) -> None:
+
+        self.db_name = db_name
+        self.host = host
+        self.port = port
+        print(f"Połączono z bazą danych: {self.db_name} na {self.host}:{self.port}")
 
 
-@dataclass
-class Smartphone:
-    brand: str
-    model: str
-    year: int
-    specs: List[str]
+    def connect(self):
+        print(f"Połączono z bazą danych: {self.db_name} na {self.host}:{self.port}")
 
-    def __str__(self):
-        return f"{self.brand} {self.model} ({self.year}) - Specs: {', '.join(self.specs)}"
+    def disconnect(self):
+        print(f"Rozłączono z bazą danych: {self.db_name} na {self.host}:{self.port}")
 
-# 📌 Interfejs fabryki smartfonów
-class SmartphoneFactory(ABC):
-    @abstractmethod
-    def create_smartphone(self, year: int) -> Smartphone:
-        pass
+db1 = DatabaseConnection("MyDataBase", "localhost1", 2931)
+db2 = DatabaseConnection("AnotherDataBase", "localhost", 2932)
 
-# 📌 Fabryka Apfel (Apple)
-class ApfelFactory(SmartphoneFactory):
-    def create_smartphone(self, year: int) -> Smartphone:
-        models = {
-            2023: "Apfel X",
-            2022: "Apfel Y",
-            2021: "Apfel Z"
-        }
-        specs = ["OLED Display", "Face ID", "iOS"]
-        return Smartphone(brand="Apfel", model=models.get(year, "Unknown"), year=year, specs=specs)
+print(f"db1 i db2 to ta sama instancja? {db1 is db2}")
 
-# 📌 Fabryka Szajsung (Samsung)
-class SzajsungFactory(SmartphoneFactory):
-    def create_smartphone(self, year: int) -> Smartphone:
-        models = {
-            2023: "Szajsung Ultra",
-            2022: "Szajsung Pro",
-            2021: "Szajsung Lite"
-        }
-        specs = ["AMOLED Display", "Fingerprint Sensor", "Android"]
-        return Smartphone(brand="Szajsung", model=models.get(year, "Unknown"), year=year, specs=specs)
+db1.connect()
+db2.disconnect()
 
-# 📌 Fabryka MajFon (Nowa Marka)
-class MajFonFactory(SmartphoneFactory):
-    def create_smartphone(self, year: int) -> Smartphone:
-        models = {
-            2023: "MajFon Mega",
-            2022: "MajFon Turbo",
-            2021: "MajFon Basic"
-        }
-        specs = ["LCD Display", "Dual SIM", "Custom OS"]
-        return Smartphone(brand="MajFon", model=models.get(year, "Unknown"), year=year, specs=specs)
 
-class AbstractSmartphoneFactory:
-    _factories = {}
 
-    @staticmethod
-    def register_factory(brand: str, factory_class):
-        AbstractSmartphoneFactory._factories[brand] = factory_class
 
-    @staticmethod
-    def get_factory(brand: str) -> SmartphoneFactory:
-        factory = AbstractSmartphoneFactory._factories.get(brand)
-        if not factory:
-            raise ValueError(f"Unknown smartphone brand: {brand}")
-        return factory()
 
-AbstractSmartphoneFactory.register_factory("Apfel", ApfelFactory)
-AbstractSmartphoneFactory.register_factory("Szajsung", SzajsungFactory)
-AbstractSmartphoneFactory.register_factory("MajFon", MajFonFactory)
 
-if __name__ == "__main__":
-    # Zamówienia na smartfony różnych marek z różnych lat
-    brands = ["Apfel", "Szajsung", "MajFon"]
-    years = [2023, 2022, 2021]
 
-    for brand in brands:
-        factory = AbstractSmartphoneFactory.get_factory(brand)
-        for year in years:
-            smartphone = factory.create_smartphone(year)
-            print(smartphone)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
